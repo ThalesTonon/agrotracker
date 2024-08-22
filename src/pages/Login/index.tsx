@@ -14,7 +14,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { axiosInstance } from "@/api/axiosInstance";
 import { showAlert } from "@/components/ShowAlerts";
-import { Link } from "react-router-dom";
 
 export default function Login() {
   const [authLoading, setAuthLoading] = useState(false); // Estado para o carregamento da autenticação
