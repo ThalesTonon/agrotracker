@@ -1,6 +1,4 @@
 import { axiosInstance } from "@/api/axiosInstance";
-import { useAxiosGet } from "@/api/useAxios";
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 type Event = {
@@ -16,7 +14,6 @@ type Event = {
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<Event[] | null>(null);
 
   useEffect(() => {
@@ -31,7 +28,6 @@ export default function Home() {
     <div>
       <h1>Home</h1>
       {isLoading && <p>Carregando...</p>}
-      {error && <p>Erro ao carregar!</p>}
       {data && data.length > 0 ? (
         <ul>
           {data.map((event) => (
