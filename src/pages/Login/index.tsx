@@ -22,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { axiosInstance } from "@/api/axiosInstance";
 import { showAlert } from "@/components/ShowAlerts";
+import { useAuth } from "@/context/auth";
 
 type Company = {
   id: number;
@@ -66,6 +67,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false); // Estado para mostrar a senha
   const [companySelected, setCompanySelected] = useState("Teste"); // Estado para a empresa selecionada
   const [roleSelected, setRoleSelected] = useState(""); // Estado para a função selecionada
+  const { login } = useAuth();
   const emailValidation = () => {
     let emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     if (emailReg.test(email) === false) {
@@ -86,18 +88,7 @@ export default function Login() {
       setAuthLoading(false);
       return;
     }
-    axiosInstance
-      .post("login", { email, password })
-      .then((response) => {
-        showAlert("success", "Sucesso!", "Login efetuado com sucesso!");
-        localStorage.setItem("access_token", response.data.access_token);
-        window.location.href = "/";
-      })
-      .catch(() => {
-        showAlert("error", "Oops...", "Email ou senha inválidos!");
-        setAuthLoading(false);
-        return;
-      });
+    login(email, password);
   };
   const handleRegister = () => {
     setAuthLoading(true);

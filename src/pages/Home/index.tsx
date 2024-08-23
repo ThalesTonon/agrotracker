@@ -1,5 +1,4 @@
-import { axiosInstance } from "@/api/axiosInstance";
-import { useEffect, useState } from "react";
+import { useAxiosGet } from "@/api/useAxios";
 
 type Event = {
   id: number;
@@ -13,16 +12,7 @@ type Event = {
 };
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<Event[] | null>(null);
-
-  useEffect(() => {
-    axiosInstance.get<Event[]>("events").then((response) => {
-      console.log(response.data);
-      setData(response.data);
-      setIsLoading(false);
-    });
-  }, []);
+  const { data, isLoading } = useAxiosGet<Event[]>("events");
 
   return (
     <div>
