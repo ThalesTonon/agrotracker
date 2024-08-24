@@ -33,7 +33,7 @@ if (token && userId !== null && userId !== undefined) {
 
         setTimeout(() => {
           window.location.href = "/login";
-        }, 30000); // Redireciona após 2 segundos
+        }, 2000); // Redireciona após 2 segundos
       }
       return Promise.reject(error);
     }
