@@ -22,13 +22,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "@/assets/agroTrackerLogo.png";
 import { useAuth } from "@/context/auth";
 import Swal from "sweetalert2";
+import { useContext } from "react";
+import { UserContext } from "@/context/UserContext";
 
 export function Sidebar() {
-  const { logout } = useAuth();
+  let pageTitle = useLocation().pathname.replace("/", "").toUpperCase();
+
+  if (pageTitle === "") {
+    pageTitle = "INÍCIO";
+  }
+
   const handleLogout = () => {
     Swal.fire({
       title: "Você tem certeza?",
@@ -45,9 +52,14 @@ export function Sidebar() {
       }
     });
   };
+  const userContext = useContext(UserContext);
+  const { logout } = useAuth();
+  const imageUrl =
+    "https://api.dicebear.com/9.x/initials/svg?radius=0&backgroundColor=b6e3f4&seed=" +
+      userContext.user?.name || "User";
   return (
-    <div className="flex w-full flex-col bg-muted/40">
-      {/* Menu Desktop */}''
+    <>
+      {/* Menu Desktop */}
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 border-r bg-background sm:flex">
         <nav className="flex flex-col items-center gap-4 px-2 py-5">
           <TooltipProvider>
@@ -145,83 +157,107 @@ export function Sidebar() {
       </aside>
       {/* Menu Mobile */}
       <div className="sm:hidden flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <header className="sticky top-0 z-30 flex h-14 items-center px-4 border-b gap-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="outline" className="sm:hidden">
-                <PanelBottom></PanelBottom>
-                <span className="sr-only">Abrir / Fechar Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="sm:max-w-xs">
-              <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
-              <SheetDescription className="sr-only">
-                Use este menu para navegar pelas principais seções do site,
-                incluindo início, planejamento, financeiro, estoque, e mais.
-              </SheetDescription>
-              <nav className="grid gap-6 text-lg font-medium">
-                <Link
-                  to="#"
-                  className="flex h-10 w-10 bg-primary rounded-full items-center justify-center text-primary-foreground md:text-base gap-2"
-                >
-                  <Package className="h-5 w-5" />
-                  <span className="sr-only">Logo do projeto</span>
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
-                >
-                  <Home className="h-5 w-5 transition-all" />
-                  Início
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
-                >
-                  <Calendar className="h-5 w-5 transition-all" />
-                  Planejamento
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
-                >
-                  <Wallet className="h-5 w-5 transition-all" />
-                  Financeiro
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
-                >
-                  <Package className="h-5 w-5 transition-all" />
-                  Estoque
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
-                >
-                  <Tractor className="h-5 w-5 transition-all" />
-                  Equipamentos
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
-                >
-                  <Settings className="h-5 w-5 transition-all" />
-                  Configurações
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
-                >
-                  <LogOut className="h-5 w-5 transition-all" />
-                  Logout
-                </Link>
-              </nav>
-            </SheetContent>
-            <h2>Menu</h2>
-          </Sheet>
-        </header>
+        <div className="flex w-full flex-col bg-muted/40">
+          <header className="sticky top-0 z-30 flex h-14 items-center px-4 border-b gap-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button size="icon" variant="outline" className="sm:hidden">
+                  <PanelBottom></PanelBottom>
+                  <span className="sr-only">Abrir / Fechar Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="sm:max-w-xs">
+                <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
+                <SheetDescription className="sr-only">
+                  Use este menu para navegar pelas principais seções do site,
+                  incluindo início, planejamento, financeiro, estoque, e mais.
+                </SheetDescription>
+                <nav className="grid gap-6 text-lg font-medium">
+                  <Link
+                    to="#"
+                    className="flex h-10 w-10 bg-primary rounded-full items-center justify-center text-primary-foreground md:text-base gap-2"
+                  >
+                    <Package className="h-5 w-5" />
+                    <span className="sr-only">Logo do projeto</span>
+                  </Link>
+                  <Link
+                    to="#"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                  >
+                    <Home className="h-5 w-5 transition-all" />
+                    Início
+                  </Link>
+                  <Link
+                    to="#"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                  >
+                    <Calendar className="h-5 w-5 transition-all" />
+                    Planejamento
+                  </Link>
+                  <Link
+                    to="#"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                  >
+                    <Wallet className="h-5 w-5 transition-all" />
+                    Financeiro
+                  </Link>
+                  <Link
+                    to="#"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                  >
+                    <Package className="h-5 w-5 transition-all" />
+                    Estoque
+                  </Link>
+                  <Link
+                    to="#"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                  >
+                    <Tractor className="h-5 w-5 transition-all" />
+                    Equipamentos
+                  </Link>
+                  <Link
+                    to="#"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                  >
+                    <Settings className="h-5 w-5 transition-all" />
+                    Configurações
+                  </Link>
+                  <Link
+                    onClick={() => {
+                      handleLogout();
+                    }}
+                    to="#"
+                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                  >
+                    <LogOut className="h-5 w-5 transition-all" />
+                    Logout
+                  </Link>
+                </nav>
+              </SheetContent>
+              <h2>Menu</h2>
+            </Sheet>
+            {/* Navbar */}
+            <div className="flex w-full items-center justify-around">
+              <h1 className="text-xl font-bold">{pageTitle}</h1>
+              <div className="flex gap-4">
+                <div className="flex items-center">
+                  <img
+                    className="h-10 w-10 rounded-full"
+                    src={imageUrl}
+                    alt=""
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <p className="text-sm">{userContext.user?.name || "User"}</p>
+                  <p className="text-base">
+                    {userContext.user?.role || "Função"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </header>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

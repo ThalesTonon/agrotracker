@@ -2,11 +2,10 @@ import Home from "@/pages/Home";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import Login from "@/pages/Login";
-
-const token = localStorage.getItem("access_token");
-const isAuthenticated = token ? true : false;
+import Cookies from "js-cookie";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = Cookies.get("access_token") ? true : false;
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
@@ -27,6 +26,14 @@ export default function RoutesComponent() {
         <Routes>
           <Route
             path="/"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/home"
             element={
               <PrivateRoute>
                 <Home />
