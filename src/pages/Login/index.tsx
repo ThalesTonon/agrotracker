@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import { axiosInstance } from "@/api/axiosInstance";
 import { showAlert } from "@/components/ShowAlerts";
 import { useAuth } from "@/context/auth";
@@ -36,7 +36,7 @@ type Company = {
 };
 
 export default function Login() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingCompany, setIsLoadingCompany] = useState(true);
   const [data, setData] = useState<Company[] | null>(null);
 
   useEffect(() => {
@@ -44,17 +44,13 @@ export default function Login() {
       .get<Company[]>("company")
       .then((response) => {
         setData(response.data);
-        setIsLoading(false);
+        setIsLoadingCompany(false);
       })
       .catch(() => {
-        showAlert(
-          "error",
-          "Oops...",
-          "Erro ao carregar empresas! Tente novamente mais tarde."
-        );
+        setIsLoadingCompany(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoadingCompany(false);
       });
   }, []);
 
@@ -65,7 +61,7 @@ export default function Login() {
   const [confirmPassword, setConfirmPassword] = useState(""); // Estado para mostrar a senha
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Estado para mostrar a confirmação da senha
   const [showPassword, setShowPassword] = useState(false); // Estado para mostrar a senha
-  const [companySelected, setCompanySelected] = useState("Teste"); // Estado para a empresa selecionada
+  const [companySelected, setCompanySelected] = useState(""); // Estado para a empresa selecionada
   const [roleSelected, setRoleSelected] = useState(""); // Estado para a função selecionada
   const { login } = useAuth();
   const emailValidation = () => {
@@ -89,6 +85,7 @@ export default function Login() {
       return;
     }
     login(email, password);
+    setAuthLoading(false);
   };
   const handleRegister = () => {
     setAuthLoading(true);
@@ -110,6 +107,17 @@ export default function Login() {
       showAlert("error", "Oops...", "As senhas não conferem!");
       return;
     }
+    if (companySelected === "") {
+      setAuthLoading(false);
+      showAlert("error", "Oops...", "Selecione uma empresa!");
+      return;
+    }
+    if (roleSelected === "") {
+      setAuthLoading(false);
+      showAlert("error", "Oops...", "Selecione uma função!");
+      return;
+    }
+
     axiosInstance
       .post("register", {
         name,
@@ -130,6 +138,7 @@ export default function Login() {
           "Oops...",
           error.response?.data?.message || "Informações inválidas!"
         );
+        setAuthLoading(false);
         return;
       });
   };
@@ -175,7 +184,11 @@ export default function Login() {
           </CardContent>
           <CardFooter>
             <Button onClick={() => handleLogin()}>
-              {authLoading ? "Carregando..." : "Entrar"}
+              {authLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Entrar"
+              )}
             </Button>
           </CardFooter>
         </Card>
@@ -246,11 +259,13 @@ export default function Login() {
                       <SelectValue placeholder="Empresas" />
                     </SelectTrigger>
                     <SelectContent>
-                      {isLoading && (
+                      {isLoadingCompany && (
                         <SelectItem value="Carregando">
+                          {/* <Loader2 className="h-4 w-4 animate-spin" /> */}
                           Carregando...
                         </SelectItem>
                       )}
+
                       {data?.map((company) => (
                         <SelectItem
                           key={company.id}
@@ -282,7 +297,11 @@ export default function Login() {
           </CardContent>
           <CardFooter className="pl-6 pb-3">
             <Button onClick={() => handleRegister()}>
-              {authLoading ? "Carregando..." : "Criar conta"}
+              {authLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Criar conta"
+              )}
             </Button>
           </CardFooter>
         </Card>

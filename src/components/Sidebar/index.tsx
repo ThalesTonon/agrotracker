@@ -26,26 +26,26 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "@/assets/agroTrackerLogo.png";
 import { useAuth } from "@/context/auth";
 import Swal from "sweetalert2";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 
 export function Sidebar() {
   let pageTitle = useLocation().pathname.replace("/", "").toUpperCase();
-
+  const [openSheet, setOpenSheet] = useState(false);
   if (pageTitle === "") {
-    pageTitle = "INÍCIO";
+    pageTitle = "HOME";
   }
-
   const handleLogout = () => {
+    setOpenSheet(false);
     Swal.fire({
-      title: "Você tem certeza?",
-      text: "Você será deslogado do sistema!",
-      icon: "warning",
+      title: "Tem certeza?",
+      text: "Você deseja sair da sua conta?",
+      icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Sim, deslogar!",
+      confirmButtonText: "Sim",
       cancelButtonText: "Cancelar",
-      confirmButtonColor: "#16a34a",
-      cancelButtonColor: "#dc2626",
+      confirmButtonColor: "#88D53D",
+      cancelButtonColor: "#FF0000",
     }).then((result) => {
       if (result.isConfirmed) {
         logout();
@@ -53,9 +53,10 @@ export function Sidebar() {
     });
   };
   const userContext = useContext(UserContext);
+
   const { logout } = useAuth();
   const imageUrl =
-    "https://api.dicebear.com/9.x/initials/svg?radius=0&backgroundColor=b6e3f4&seed=" +
+    "https://api.dicebear.com/9.x/initials/svg?radius=0&backgroundColor=88D53D&seed=" +
       userContext.user?.name || "User";
   return (
     <>
@@ -74,7 +75,7 @@ export function Sidebar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  to="#"
+                  to="/"
                   className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Home className="h-5 w-5" />
@@ -85,7 +86,7 @@ export function Sidebar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  to="#"
+                  to="planejamento"
                   className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Calendar className="h-5 w-5" />
@@ -159,7 +160,7 @@ export function Sidebar() {
       <div className="sm:hidden flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
         <div className="flex w-full flex-col bg-muted/40">
           <header className="sticky top-0 z-30 flex h-14 items-center px-4 border-b gap-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent">
-            <Sheet>
+            <Sheet open={openSheet} onOpenChange={setOpenSheet}>
               <SheetTrigger asChild>
                 <Button size="icon" variant="outline" className="sm:hidden">
                   <PanelBottom></PanelBottom>
@@ -175,20 +176,26 @@ export function Sidebar() {
                 <nav className="grid gap-6 text-lg font-medium">
                   <Link
                     to="#"
-                    className="flex h-10 w-10 bg-primary rounded-full items-center justify-center text-primary-foreground md:text-base gap-2"
+                    className="flex h-10 w-10 bg-primary/20 rounded-full items-center justify-center text-primary-foreground md:text-base"
                   >
-                    <Package className="h-5 w-5" />
+                    <img src={logo} alt="Logo do projeto" />
                     <span className="sr-only">Logo do projeto</span>
                   </Link>
                   <Link
-                    to="#"
+                    to="/"
+                    onClick={() => {
+                      setOpenSheet(false);
+                    }}
                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
                   >
                     <Home className="h-5 w-5 transition-all" />
                     Início
                   </Link>
                   <Link
-                    to="#"
+                    to="planejamento"
+                    onClick={() => {
+                      setOpenSheet(false);
+                    }}
                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
                   >
                     <Calendar className="h-5 w-5 transition-all" />

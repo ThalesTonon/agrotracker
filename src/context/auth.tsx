@@ -29,9 +29,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const response = await axiosInstance.post("login", { email, password });
       showAlert("success", "Sucesso!", "Login efetuado com sucesso!");
       Cookies.set("access_token", response.data.access_token, {
-        expires: 1 / 35,
+        expires: 1 / 30,
       });
       Cookies.set("User_id", response.data.user.id, { expires: 1 / 30 });
+      Cookies.set("Company_id", response.data.user.company_id, {
+        expires: 1 / 30,
+      });
       setInterval(() => {
         window.location.href = "/";
       }, 1000);
@@ -47,6 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         showAlert("success", "Sucesso!", "Logout efetuado com sucesso!");
         Cookies.remove("access_token");
         Cookies.remove("User_id");
+        Cookies.remove("Company_id");
         setInterval(() => {
           window.location.href = "/login";
         }, 1000);

@@ -8,11 +8,10 @@ const headers = {
   Authorization: "Bearer " + token,
 };
 const axiosInstance = axios.create({
-  baseURL: "https://apiagrotracker.thalestonon.com.br/api/",
-  // baseURL: "http://127.0.0.1:8000/api/",
+  // baseURL: "https://apiagrotracker.thalestonon.com.br/api/",
+  baseURL: "http://127.0.0.1:8000/api/",
   headers,
 });
-console.log("Token set in axiosInstance:", token);
 // Intercepta as respostas
 if (token && userId !== null && userId !== undefined) {
   axiosInstance.interceptors.response.use(
@@ -30,6 +29,7 @@ if (token && userId !== null && userId !== undefined) {
         });
         Cookies.remove("access_token");
         Cookies.remove("User_id");
+        Cookies.remove("Company_id");
 
         setTimeout(() => {
           window.location.href = "/login";

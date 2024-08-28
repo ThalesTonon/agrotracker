@@ -3,9 +3,11 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import Login from "@/pages/Login";
 import Cookies from "js-cookie";
+import Planejamento from "@/pages/Planejamento";
+
+const isAuthenticated = Cookies.get("access_token") ? true : false;
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = Cookies.get("access_token") ? true : false;
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
@@ -37,6 +39,14 @@ export default function RoutesComponent() {
             element={
               <PrivateRoute>
                 <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/planejamento"
+            element={
+              <PrivateRoute>
+                <Planejamento />
               </PrivateRoute>
             }
           />

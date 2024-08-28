@@ -1,19 +1,17 @@
+import { UserContext } from "@/context/UserContext";
+import { useContext } from "react";
+
 interface NavBarProps {
   title: string;
-  user: {
-    photo: string;
-    name: string;
-    role: string;
-  };
 }
-
 export default function NavBar(props: NavBarProps) {
   const title = props.title.toUpperCase();
+  const userContext = useContext(UserContext);
   let userImageURL =
-    "https://api.dicebear.com/9.x/initials/svg?radius=0&backgroundColor=b6e3f4&seed=" +
-      props.user?.name || "User";
+    "https://api.dicebear.com/9.x/initials/svg?radius=0&backgroundColor=88D53D&seed=" +
+      userContext.user?.name || "User";
   return (
-    <nav className="hidden sm:flex w-full items-center bg-muted/80 py-4 rounded-full">
+    <nav className="hidden sm:flex w-full items-center bg-muted/40 py-4 rounded-full mb-4">
       <div className="flex w-full justify-start pl-8">
         <h1 className="text-2xl font-bold">{title}</h1>
       </div>
@@ -22,11 +20,11 @@ export default function NavBar(props: NavBarProps) {
           <img
             className="rounded-full h-10 w-10 "
             src={userImageURL}
-            alt={props.user?.name}
+            alt={userContext.user?.name || "User"}
           />
           <div>
-            <p>{props.user?.name || "User"}</p>
-            <p>{props.user?.role || "Função"}</p>
+            <p>{userContext.user?.name || "User"}</p>
+            <p>{userContext.user?.role || "Função"}</p>
           </div>
         </div>
       </div>

@@ -19,6 +19,6 @@ export function useAxiosGet<T = unknown>(url: string) {
         setIsLoading(false);
       });
   }, []);
-
+  console.log(data);
   return { data, error, isLoading };
 }
