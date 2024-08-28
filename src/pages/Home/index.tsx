@@ -3,6 +3,7 @@ export default function Home() {
   return (
     <div>
       <NavBar title="Home" />
+      <h1>Teste</h1>
     </div>
   );
 }
