@@ -52,8 +52,9 @@ interface Event {
   company_id: number;
 }
 export default function Planejamento() {
-  const idCompanyByUser = Cookies.get("Company_id") || "";
-  const userId = Cookies.get("User_id") || "";
+  const userJson = JSON.parse(Cookies.get("User") || "{}");
+  const idCompanyByUser = userJson.company_id;
+  const userId = userJson.id;
   const [dataEvents, setDataEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -335,8 +336,8 @@ export default function Planejamento() {
                         </PopoverTrigger>
                         <PopoverContent
                           className="w-auto p-0"
-                          side="right"
-                          align="start"
+                          side="top"
+                          align="center"
                         >
                           <Calendar
                             id="startADD"
@@ -359,8 +360,8 @@ export default function Planejamento() {
                         </PopoverTrigger>
                         <PopoverContent
                           className="w-auto p-0"
-                          side="right"
-                          align="start"
+                          side="top"
+                          align="center"
                         >
                           <Calendar
                             id="endADD"
@@ -427,7 +428,11 @@ export default function Planejamento() {
                                   : "Início"}
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
+                            <PopoverContent
+                              className="w-auto p-0"
+                              side="top"
+                              align="center"
+                            >
                               <Calendar
                                 id="startFILTER"
                                 locale={ptBR}
@@ -452,7 +457,11 @@ export default function Planejamento() {
                                   : "Fim"}
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
+                            <PopoverContent
+                              className="w-auto p-0"
+                              side="top"
+                              align="center"
+                            >
                               <Calendar
                                 id="endFILTER"
                                 locale={ptBR}
@@ -466,7 +475,7 @@ export default function Planejamento() {
                         </div>
                       </div>
 
-                      <DrawerFooter className="flex flex-row ">
+                      <DrawerFooter className="flex flex-row">
                         <Button
                           variant="default"
                           onClick={() => applyFilters()}
@@ -480,8 +489,8 @@ export default function Planejamento() {
                           Limpar Filtros
                         </Button>
                         <DrawerClose>
-                          <Button variant="outline" className="w-full">
-                            Cancel
+                          <Button variant="default" className="w-full">
+                            Cancelar
                           </Button>
                         </DrawerClose>
                       </DrawerFooter>
@@ -564,8 +573,8 @@ export default function Planejamento() {
                                 </PopoverTrigger>
                                 <PopoverContent
                                   className="w-auto p-0"
-                                  side="right"
-                                  align="start"
+                                  side="top"
+                                  align="center"
                                 >
                                   <Calendar
                                     id="startEDIT"
@@ -590,8 +599,8 @@ export default function Planejamento() {
                                 </PopoverTrigger>
                                 <PopoverContent
                                   className="w-auto p-0"
-                                  side="right"
-                                  align="start"
+                                  side="top"
+                                  align="center"
                                 >
                                   <Calendar
                                     id="endEDIT"
