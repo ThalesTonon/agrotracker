@@ -5,8 +5,6 @@ import Login from "@/pages/Login";
 import Cookies from "js-cookie";
 import Planejamento from "@/pages/Planejamento";
 import Financeiro from "@/pages/Financeiro";
-import { useContext } from "react";
-import { UserContext } from "@/context/UserContext";
 import Produtos from "@/pages/Produtos";
 
 const isAuthenticated = Cookies.get("access_token") ? true : false;
@@ -18,7 +16,6 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 export default function RoutesComponent() {
   const location = useLocation();
   const showSidebar = location.pathname !== "/login";
-  const userContext = useContext(UserContext);
 
   return (
     <>

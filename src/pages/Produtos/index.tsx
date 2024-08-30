@@ -354,7 +354,7 @@ export default function Produtos() {
     const fetchWidget = async () => {
       try {
         const screenWidth = window.innerWidth;
-        const width = screenWidth > 400 ? "400px" : `${screenWidth - 200}px`;
+        const width = screenWidth > 400 ? "700px" : `${screenWidth - 200}px`;
 
         // Gera a string de indicadores para a URL
         const indicadores = companyProducts
@@ -541,10 +541,16 @@ export default function Produtos() {
         </CardContent>
         <CardFooter></CardFooter>
       </Card>
-      <div
-        dangerouslySetInnerHTML={{ __html: widgetHtml }}
-        className="w-auto"
-      />
+      <Card className="w-full mt-4">
+        <CardHeader>
+          <CardTitle>Preços</CardTitle>
+          <CardDescription>Preços dos produtos monitorados.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid justify-center">
+          <div dangerouslySetInnerHTML={{ __html: widgetHtml }} />
+        </CardContent>
+        <CardFooter></CardFooter>
+      </Card>
     </>
   );
 }

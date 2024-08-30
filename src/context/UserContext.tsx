@@ -1,4 +1,3 @@
-import { axiosInstance } from "@/api/axiosInstance";
 import Cookies from "js-cookie";
 import { createContext, useEffect, useState } from "react";
 
@@ -28,8 +27,6 @@ export const UserProvider = ({ children }: UserContextProviderType) => {
 
   const token = Cookies.get("access_token");
   const userJson = JSON.parse(Cookies.get("User") || "{}");
-  const userId = userJson.id;
-  const [hasFetched, setHasFetched] = useState(false);
 
   const updateUser = () => {
     if (!token) {
