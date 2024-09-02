@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -17,12 +16,25 @@ import {
 } from "@/components/ui/select";
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import { axiosInstance } from "@/api/axiosInstance";
 import { showAlert } from "@/components/ShowAlerts";
 import { useAuth } from "@/context/auth";
+
+// Formulário de login
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 type Company = {
   id: number;
@@ -34,8 +46,86 @@ type Company = {
   created_at: string;
   updated_at: string;
 };
+const formSchemaLogin = z.object({
+  email: z
+    .string({ required_error: "Email é obrigatório" })
+    .email({ message: "Email inválido" }),
+  password: z
+    .string({ required_error: "Senha é obrigatória" })
+    .min(8, "Senha deve ter no mínimo 8 caracteres"),
+});
+const formSchemaRegister = z.object({
+  name: z.string({ required_error: "Nome é obrigatório" }),
+  email: z
+    .string({ required_error: "Email é obrigatório" })
+    .email({ message: "Email inválido" }),
+  password: z
+    .string({ required_error: "Senha é obrigatória" })
+    .min(8, "Senha deve ter no mínimo 8 caracteres"),
+  confirmPassword: z
+    .string({
+      required_error: "Confirmação de senha é obrigatória",
+    })
+    .min(8, "Senha deve ter no mínimo 8 caracteres"),
+  company_id: z.string({ required_error: "Empresa é obrigatória" }),
+  role: z.string({ required_error: "Função é obrigatória" }),
+});
 
 export default function Login() {
+  const formLogin = useForm<z.infer<typeof formSchemaLogin>>({
+    resolver: zodResolver(formSchemaLogin),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+  function onSubmitLogin(values: z.infer<typeof formSchemaLogin>) {
+    login(values.email, values.password);
+  }
+  const formRegister = useForm<z.infer<typeof formSchemaRegister>>({
+    resolver: zodResolver(formSchemaRegister),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      company_id: "",
+    },
+  });
+  function onSubmitRegister(values: z.infer<typeof formSchemaRegister>) {
+    setAuthLoading(true);
+    if (values.password !== values.confirmPassword) {
+      showAlert("error", "Oops...", "As senhas não conferem!");
+      setAuthLoading(false);
+      return;
+    }
+    if (values.company_id === "Carregando") {
+      showAlert(
+        "error",
+        "Carregando...",
+        "Carregando empresas, aguarde um momento!"
+      );
+      setAuthLoading(false);
+      return;
+    }
+    axiosInstance
+      .post("register", {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        password_confirmation: values.confirmPassword,
+        company_id: values.company_id,
+        role: values.role,
+      })
+      .then(() => {
+        showAlert("success", "Sucesso!", "Usuário criado com sucesso!");
+        setAuthLoading(false);
+      })
+      .catch((error) => {
+        showAlert("error", "Oops...", error.response?.data?.message);
+        setAuthLoading(false);
+      });
+  }
   const [isLoadingCompany, setIsLoadingCompany] = useState(true);
   const [data, setData] = useState<Company[] | null>(null);
 
@@ -55,257 +145,266 @@ export default function Login() {
   }, []);
 
   const [authLoading, setAuthLoading] = useState(false); // Estado para o carregamento da autenticação
-  const [name, setName] = useState(""); // Estado para o nome
-  const [email, setEmail] = useState(""); // Estado para o email
-  const [password, setPassword] = useState(""); // Estado para a senha
-  const [confirmPassword, setConfirmPassword] = useState(""); // Estado para mostrar a senha
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Estado para mostrar a confirmação da senha
   const [showPassword, setShowPassword] = useState(false); // Estado para mostrar a senha
-  const [companySelected, setCompanySelected] = useState(""); // Estado para a empresa selecionada
-  const [roleSelected, setRoleSelected] = useState(""); // Estado para a função selecionada
   const { login } = useAuth();
-  const emailValidation = () => {
-    let emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-    if (emailReg.test(email) === false) {
-      showAlert("error", "Oops...", "Email inválido!");
-      setAuthLoading(false);
-      return false;
-    }
-    return true;
-  };
-
-  const handleLogin = () => {
-    setAuthLoading(true);
-    if (emailValidation() === false) {
-      return;
-    }
-    if (password === "") {
-      showAlert("error", "Oops...", "Digite uma senha!");
-      setAuthLoading(false);
-      return;
-    }
-    login(email, password);
-    setAuthLoading(false);
-  };
-  const handleRegister = () => {
-    setAuthLoading(true);
-    if (name === "") {
-      showAlert("error", "Oops...", "Digite um nome!");
-      setAuthLoading(false);
-      return;
-    }
-    if (emailValidation() === false) {
-      return;
-    }
-    if (password === "") {
-      setAuthLoading(false);
-      showAlert("error", "Oops...", "Digite uma senha!");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setAuthLoading(false);
-      showAlert("error", "Oops...", "As senhas não conferem!");
-      return;
-    }
-    if (companySelected === "") {
-      setAuthLoading(false);
-      showAlert("error", "Oops...", "Selecione uma empresa!");
-      return;
-    }
-    if (roleSelected === "") {
-      setAuthLoading(false);
-      showAlert("error", "Oops...", "Selecione uma função!");
-      return;
-    }
-
-    axiosInstance
-      .post("register", {
-        name,
-        email,
-        password,
-        password_confirmation: confirmPassword,
-        company_id: companySelected,
-        role: roleSelected,
-      })
-      .then(() => {
-        setAuthLoading(false);
-        showAlert("success", "Sucesso!", "Usuário criado com sucesso!");
-      })
-      .catch((error) => {
-        setAuthLoading(false);
-        showAlert(
-          "error",
-          "Oops...",
-          error.response?.data?.message || "Informações inválidas!"
-        );
-        setAuthLoading(false);
-        return;
-      });
-  };
 
   return (
-    <Tabs defaultValue="login" className="w-[400px] text-sm">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="login">Conta</TabsTrigger>
-        <TabsTrigger value="register">Criar Conta</TabsTrigger>
-      </TabsList>
-      <TabsContent value="login">
-        <Card>
-          <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>
-              Preencha os campos para acessar a sua conta.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="space-y-1">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Email"
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="password">Senha</Label>
-              <div className="flex w-full max-w-sm items-center space-x-2">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Senha"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Button onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button onClick={() => handleLogin()}>
-              {authLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Entrar"
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
-      </TabsContent>
-      <TabsContent value="register">
-        <Card>
-          <CardHeader>
-            <CardTitle>Registrar</CardTitle>
-            <CardDescription>
-              Preencha os campos para criar uma nova conta.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="space-y-1">
-              <Label htmlFor="name">Nome</Label>
-              <Input
-                onChange={(e) => setName(e.target.value)}
-                type="text"
-                id="name"
-                placeholder="Nome Completo"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Email"
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="password">Senha</Label>
-              <div className="flex w-full max-w-sm items-center space-x-2">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Senha"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Button onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-              <div className="flex w-full max-w-sm items-center space-x-2">
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  id="confirmPassword"
-                  placeholder="Confirmar Senha"
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-                <Button
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+    <>
+      <Tabs defaultValue="login" className="w-[400px] text-sm">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="login">Login</TabsTrigger>
+          <TabsTrigger value="register">Criar Conta</TabsTrigger>
+        </TabsList>
+        <TabsContent value="login">
+          <Card>
+            <CardHeader>
+              <CardTitle>Login</CardTitle>
+              <CardDescription>
+                Preencha os campos para acessar a sua conta.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Form {...formLogin}>
+                <form
+                  onSubmit={formLogin.handleSubmit(onSubmitLogin)}
+                  className="space-y-8"
                 >
-                  {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
-                </Button>
-              </div>
-            </div>
-            <div className="flex flex-row">
-              <div className="w-1/2 ">
-                <Label>Empresas</Label>
-                <div className="flex w-4/5 max-w-sm items-center space-x-2">
-                  <Select onValueChange={setCompanySelected}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Empresas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {isLoadingCompany && (
-                        <SelectItem value="Carregando">
-                          {/* <Loader2 className="h-4 w-4 animate-spin" /> */}
-                          Carregando...
-                        </SelectItem>
-                      )}
+                  <FormField
+                    control={formLogin.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="contato@agrotracker.com"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Email utilizado para acessar a plataforma.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formLogin.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Senha</FormLabel>
+                        <FormControl>
+                          <div className="flex w-full max-w-sm items-center space-x-2">
+                            <Input
+                              type={showPassword ? "text" : "password"}
+                              placeholder="********"
+                              {...field}
+                            />
+                            <Button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                            </Button>
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Senha utilizada para acessar a plataforma.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit">Entrar</Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="register">
+          <Card>
+            <CardHeader>
+              <CardTitle>Registrar</CardTitle>
+              <CardDescription>
+                Preencha os campos para criar uma nova conta.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Form {...formRegister}>
+                <form
+                  onSubmit={formRegister.handleSubmit(onSubmitRegister)}
+                  className="w-full space-y-3"
+                >
+                  <FormField
+                    control={formRegister.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome</FormLabel>
+                        <FormControl>
+                          <Input
+                            required
+                            placeholder="Nome Completo"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formRegister.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input required placeholder=" Email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formRegister.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Senha</FormLabel>
+                        <FormControl>
+                          <div className="flex w-full max-w-sm items-center space-x-2">
+                            <Input
+                              required
+                              type={showPassword ? "text" : "password"}
+                              placeholder="********"
+                              {...field}
+                            />
+                            <Button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                            </Button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formRegister.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirmar Senha</FormLabel>
+                        <FormControl>
+                          <div className="flex w-full max-w-sm items-center space-x-2">
+                            <Input
+                              required
+                              type={showConfirmPassword ? "text" : "password"}
+                              placeholder="********"
+                              {...field}
+                            />
+                            <Button
+                              type="button"
+                              onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                              }
+                            >
+                              {showConfirmPassword ? (
+                                <EyeOffIcon />
+                              ) : (
+                                <EyeIcon />
+                              )}
+                            </Button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex flex-row">
+                    <div className="w-1/2 ">
+                      <FormField
+                        control={formRegister.control}
+                        name="company_id"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Empresa</FormLabel>
+                            <div className="flex w-4/5 max-w-sm items-center space-x-2">
+                              <FormControl>
+                                <Select required onValueChange={field.onChange}>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Empresa" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {isLoadingCompany && (
+                                      <SelectItem value="Carregando">
+                                        Carregando...
+                                      </SelectItem>
+                                    )}
 
-                      {data?.map((company) => (
-                        <SelectItem
-                          key={company.id}
-                          value={company.id.toString()}
-                        >
-                          {company.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="w-1/2">
-                <Label>Função</Label>
-                <div className="flex w-full max-w-sm items-center">
-                  <Select onValueChange={setRoleSelected}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Função" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Super">DEV</SelectItem>
-                      <SelectItem value="Admin">Admin</SelectItem>
-                      <SelectItem value="Colaborador">Colaborador</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="pl-6 pb-3">
-            <Button onClick={() => handleRegister()}>
-              {authLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Criar conta"
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
-      </TabsContent>
-    </Tabs>
+                                    {data?.map((company) => (
+                                      <SelectItem
+                                        key={company.id}
+                                        value={company.id.toString()}
+                                      >
+                                        {company.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="w-1/2 ">
+                      <FormField
+                        control={formRegister.control}
+                        name="role"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Função</FormLabel>
+                            <div className="flex w-4/5 max-w-sm items-center space-x-2">
+                              <FormControl>
+                                <Select required onValueChange={field.onChange}>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Função" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Super">DEV</SelectItem>
+                                    <SelectItem value="Admin">Admin</SelectItem>
+                                    <SelectItem value="Colaborador">
+                                      Colaborador
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                  <Button type="submit">
+                    {authLoading ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      "Criar Conta"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </>
   );
 }

@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import Planejamento from "@/pages/Planejamento";
 import Financeiro from "@/pages/Financeiro";
 import Produtos from "@/pages/Produtos";
+import Estoque from "@/pages/Estoque";
 
 const isAuthenticated = Cookies.get("access_token") ? true : false;
 
@@ -44,6 +45,15 @@ export default function RoutesComponent() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/estoque"
+            element={
+              <PrivateRoute>
+                <Estoque />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/planejamento"
             element={
