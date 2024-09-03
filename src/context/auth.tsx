@@ -35,6 +35,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       Cookies.set("Company_id", response.data.user.company_id, {
         expires: 1 / 30,
       });
+      Cookies.set("User", JSON.stringify(response.data.user), {
+        expires: 1 / 30,
+      });
       setInterval(() => {
         window.location.href = "/";
       }, 1000);
@@ -51,6 +54,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         Cookies.remove("access_token");
         Cookies.remove("User_id");
         Cookies.remove("Company_id");
+        Cookies.remove("User");
         setInterval(() => {
           window.location.href = "/login";
         }, 1000);

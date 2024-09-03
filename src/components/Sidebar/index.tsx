@@ -13,6 +13,7 @@ import {
   Package,
   PanelBottom,
   Settings,
+  SproutIcon,
   Tractor,
   Wallet,
 } from "lucide-react";
@@ -94,21 +95,11 @@ export function Sidebar() {
               </TooltipTrigger>
               <TooltipContent side="right">Planejamento</TooltipContent>
             </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  to="#"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <Wallet className="h-5 w-5" />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Financeiro</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  to="#"
+                  to="estoque"
                   className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Package className="h-5 w-5" />
@@ -127,18 +118,45 @@ export function Sidebar() {
               </TooltipTrigger>
               <TooltipContent side="right">Equipamentos</TooltipContent>
             </Tooltip>
+            {(userContext.user?.role === "Admin" ||
+              userContext.user?.role === "Super") && (
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      to="financeiro"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      <Wallet className="h-5 w-5" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Financeiro</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      to="produtos"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      <SproutIcon className="h-5 w-5" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Produtos</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      to="#"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      <Settings className="h-5 w-5" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Configurações</TooltipContent>
+                </Tooltip>
+              </>
+            )}
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  to="#"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <Settings className="h-5 w-5" />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Configurações</TooltipContent>
-            </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
@@ -201,15 +219,9 @@ export function Sidebar() {
                     <Calendar className="h-5 w-5 transition-all" />
                     Planejamento
                   </Link>
+
                   <Link
-                    to="#"
-                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
-                  >
-                    <Wallet className="h-5 w-5 transition-all" />
-                    Financeiro
-                  </Link>
-                  <Link
-                    to="#"
+                    to="estoque"
                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
                   >
                     <Package className="h-5 w-5 transition-all" />
@@ -222,13 +234,38 @@ export function Sidebar() {
                     <Tractor className="h-5 w-5 transition-all" />
                     Equipamentos
                   </Link>
-                  <Link
-                    to="#"
-                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
-                  >
-                    <Settings className="h-5 w-5 transition-all" />
-                    Configurações
-                  </Link>
+                  {(userContext.user?.role === "Admin" ||
+                    userContext.user?.role === "Super") && (
+                    <>
+                      <Link
+                        to="financeiro"
+                        onClick={() => {
+                          setOpenSheet(false);
+                        }}
+                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                      >
+                        <Wallet className="h-5 w-5 transition-all" />
+                        Financeiro
+                      </Link>
+                      <Link
+                        to="produtos"
+                        onClick={() => {
+                          setOpenSheet(false);
+                        }}
+                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                      >
+                        <SproutIcon className="h-5 w-5 transition-all" />
+                        Produtos
+                      </Link>
+                      <Link
+                        to="#"
+                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
+                      >
+                        <Settings className="h-5 w-5 transition-all" />
+                        Configurações
+                      </Link>
+                    </>
+                  )}
                   <Link
                     onClick={() => {
                       handleLogout();

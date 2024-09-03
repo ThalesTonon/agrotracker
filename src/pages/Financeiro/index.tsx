@@ -1,8 +1,9 @@
 import NavBar from "@/components/NavBar";
-export default function Home() {
+
+export default function Financeiro() {
   return (
     <div>
-      <NavBar title="Home" />
+      <NavBar title="Financeiro" />
     </div>
   );
 }

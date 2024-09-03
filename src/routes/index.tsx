@@ -4,6 +4,9 @@ import { Sidebar } from "@/components/Sidebar";
 import Login from "@/pages/Login";
 import Cookies from "js-cookie";
 import Planejamento from "@/pages/Planejamento";
+import Financeiro from "@/pages/Financeiro";
+import Produtos from "@/pages/Produtos";
+import Estoque from "@/pages/Estoque";
 
 const isAuthenticated = Cookies.get("access_token") ? true : false;
 
@@ -43,10 +46,36 @@ export default function RoutesComponent() {
             }
           />
           <Route
+            path="/estoque"
+            element={
+              <PrivateRoute>
+                <Estoque />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
             path="/planejamento"
             element={
               <PrivateRoute>
                 <Planejamento />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/financeiro"
+            element={
+              <PrivateRoute>
+                <Financeiro />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/produtos"
+            element={
+              <PrivateRoute>
+                <Produtos />
               </PrivateRoute>
             }
           />
