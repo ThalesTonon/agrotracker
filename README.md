@@ -1,50 +1,68 @@
-# React + TypeScript + Vite
+# [AgroTracker](https://agrotracker.vercel.app/)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-00C7B7)](https://agrotracker.vercel.app/)
 
-Currently, two official plugins are available:
+**AgroTracker** é uma aplicação web voltada para o gerenciamento eficiente de operações agrícolas, focando especialmente na agricultura familiar. A plataforma oferece um conjunto robusto de ferramentas para controle financeiro, gestão de estoque, monitoramento de equipamentos, insumos, cotações de produtos agrícolas (como café e açúcar) e planejamento de eventos.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Deploy
 
-## Expanding the ESLint configuration
+A aplicação está hospedada na Vercel, oferecendo alta disponibilidade e escalabilidade. Você pode acessá-la diretamente através do link:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+[AgroTracker - Deploy](https://agrotracker.vercel.app/)
 
-- Configure the top-level `parserOptions` property like this:
+## 📦 Funcionalidades
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Controle Financeiro**: Monitore e gerencie as finanças da sua propriedade rural, com funcionalidades para registrar despesas, receitas e gerar relatórios financeiros detalhados.
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- **Gestão de Estoque**: Controle o estoque de produtos agrícolas e equipamentos, garantindo a rastreabilidade e evitando perdas.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+- **Gerenciamento de Equipamentos**: Registre e acompanhe a manutenção de maquinários e outros equipamentos, garantindo que estejam sempre operacionais.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- **Gestão de Insumos**: Monitore a utilização e reposição de insumos agrícolas, como fertilizantes, sementes e defensivos.
+
+- **Cotação de Produtos**: Acompanhe as cotações de produtos agrícolas como café, açúcar, e outros, diretamente na plataforma.
+
+- **Planejamento de Eventos**: Planeje eventos como colheitas, manutenções, e outras atividades relevantes ao ciclo produtivo.
+
+## 🛠️ Tecnologias Utilizadas
+
+### Frontend
+
+- **React** com **Vite** para construção da interface do usuário, proporcionando uma experiência rápida e fluida.
+- **Vercel** para o deploy, garantindo alta performance e facilidade de manutenção.
+
+### Backend
+
+- **Laravel**: Framework PHP utilizado para criar uma API robusta, que fornece os dados e a lógica de negócio para o frontend.
+- **Sanctum**: Biblioteca de autenticação que gerencia a segurança e as permissões dos usuários.
+
+## ⚙️ Estrutura do Projeto
+
+O projeto está dividido em dois repositórios principais:
+
+- **Frontend**: Contém toda a lógica da interface e comunicação com a API. Hospedado na Vercel.
+- **Backend**: Desenvolvido em Laravel, responsável pela lógica de negócios, persistência de dados, autenticação e validação dos usuários. Ele também utiliza o Laravel Sanctum para a autenticação via API.
+
+## 🗂 Repositórios
+
+- [Frontend](https://github.com/seu-usuario/agrotracker-frontend) (Repositório da interface)
+- [Backend](https://github.com/seu-usuario/agrotracker-backend) (Repositório da API)
+
+## 📋 Requisitos de Sistema
+
+- **Node.js** versão 14 ou superior
+- **PHP** versão 8 ou superior
+- **Composer**
+- **Laravel** versão 9 ou superior
+
+## 🚀 Como Contribuir
+
+1. Faça um fork do projeto
+2. Crie uma nova branch (`git checkout -b feature/MinhaFuncionalidade`)
+3. Faça commit das suas alterações (`git commit -m 'Adiciona nova funcionalidade'`)
+4. Faça push para a branch (`git push origin feature/MinhaFuncionalidade`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está licenciado sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para obter mais informações.
