@@ -224,7 +224,6 @@ export default function Produtos() {
       setFilteredItems(
         group.items.map((item, index) => ({ Id: index, ...item }))
       );
-      console.log(group.items);
     } else {
       setFilteredItems([]);
     }
@@ -285,7 +284,6 @@ export default function Produtos() {
       );
       return;
     }
-    console.log("Lista de produtos a serem salvos", productList);
     axiosInstance
       .post("products/" + companyID, productList)
       .then(() => {
@@ -302,7 +300,6 @@ export default function Produtos() {
       });
   };
   const handleDeleteProductCompany = (product: itemTypes) => {
-    console.log("Deletar produto", product.Id);
     Swal.fire({
       title: "Deletar produto",
       text: "Tem certeza que deseja deletar esse produto?",
@@ -331,7 +328,7 @@ export default function Produtos() {
         showAlert(
           "error",
           "Erro ao deletar produto",
-          "Erro ao deletar produto, tente novamente mais tarde"
+          "Tente novamente mais tarde"
         );
       });
   };
@@ -339,7 +336,6 @@ export default function Produtos() {
   //Company products
   const fetchCompanyProducts = async () => {
     axiosInstance.get("products/" + companyID).then((response) => {
-      console.log(response.data);
       setCompanyProducts(response.data);
     });
   };
@@ -354,7 +350,7 @@ export default function Produtos() {
     const fetchWidget = async () => {
       try {
         const screenWidth = window.innerWidth;
-        const width = screenWidth > 400 ? "700px" : `${screenWidth - 200}px`;
+        const width = screenWidth > 500 ? "700px" : `${screenWidth - 100}px`;
 
         // Gera a string de indicadores para a URL
         const indicadores = companyProducts
@@ -362,7 +358,6 @@ export default function Produtos() {
           .join("");
 
         const url = `https://www.cepea.esalq.usp.br/br/widgetproduto.js.php?fonte=arial&tamanho=10&largura=${width}&corfundo=dbd6b2&cortexto=333333&corlinha=ede7bf${indicadores}`;
-        console.log("URL do widget:", url);
 
         const response = await fetch(url);
         const scriptText = await response.text();
@@ -382,7 +377,7 @@ export default function Produtos() {
         const resultHtml = scriptFunction(mockDocument);
         setWidgetHtml(resultHtml);
       } catch (error) {
-        console.error("Error fetching widget:", error);
+        console.error(error);
       }
     };
 
