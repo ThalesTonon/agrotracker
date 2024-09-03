@@ -45,8 +45,8 @@ O projeto está dividido em dois repositórios principais:
 
 ## 🗂 Repositórios
 
-- [Frontend](https://github.com/seu-usuario/agrotracker-frontend) (Repositório da interface)
-- [Backend](https://github.com/seu-usuario/agrotracker-backend) (Repositório da API)
+- [Frontend](https://github.com/ThalesTonon/agrotracker) (Repositório da interface)
+- [Backend](https://github.com/ThalesTonon/api_agrotracker.git) (Repositório da API)
 
 ## 📋 Requisitos de Sistema
 
