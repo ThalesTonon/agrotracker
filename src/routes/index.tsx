@@ -7,16 +7,22 @@ import Planejamento from "@/pages/Planejamento";
 import Financeiro from "@/pages/Financeiro";
 import Produtos from "@/pages/Produtos";
 import Estoque from "@/pages/Estoque";
+import Reset from "@/pages/ResetPassword";
+import CheckCode from "@/pages/ResetPassword/send-code";
 
 const isAuthenticated = Cookies.get("access_token") ? true : false;
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
-
-export default function RoutesComponent() {
+const RestricteRouteSideBar = (): boolean => {
   const location = useLocation();
-  const showSidebar = location.pathname !== "/login";
+  const currentPath = location.pathname;
+  const restrictedPaths = ["/login", "/forgot-password", "/code/check"];
+  return restrictedPaths.includes(currentPath) ? false : true;
+};
+export default function RoutesComponent() {
+  const showSidebar = RestricteRouteSideBar();
 
   return (
     <>
@@ -82,6 +88,8 @@ export default function RoutesComponent() {
           <Route path="*" element={<Navigate to="/" />} />
 
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<Reset />} />
+          <Route path="/code/check" element={<CheckCode />} />
         </Routes>
       </main>
     </>
