@@ -35,6 +35,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Link } from "react-router-dom";
 
 type Company = {
   id: number;
@@ -217,7 +218,12 @@ export default function Login() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit">Entrar</Button>
+                  <div className="flex items-center justify-between">
+                    <Button type="submit">Entrar</Button>
+                    <Link to="/forgot-password" className="text-sm ">
+                      Esqueceu a senha?
+                    </Link>
+                  </div>
                 </form>
               </Form>
             </CardContent>
