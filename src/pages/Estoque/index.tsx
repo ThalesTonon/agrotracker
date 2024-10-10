@@ -194,8 +194,12 @@ export default function Estoque() {
   const handleEditClick = (storage: StorageType) => {
     setSelectedStorage({
       ...storage,
-      entry_date: toInputDateFormat(storage.entry_date), // Converte para "yyyy-mm-dd"
-      expiration_date: toInputDateFormat(storage.expiration_date),
+      entry_date: storage.entry_date
+        ? toInputDateFormat(storage.entry_date)
+        : "", // Converte para "yyyy-mm-dd"
+      expiration_date: storage.expiration_date
+        ? toInputDateFormat(storage.expiration_date)
+        : "",
     });
     setIsEditModalOpen(true);
   };
