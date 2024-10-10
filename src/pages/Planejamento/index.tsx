@@ -126,18 +126,6 @@ export default function Planejamento() {
   };
 
   const handleEditEvent = () => {
-    if (eventTitle === "") {
-      alert("Título é obrigatório");
-      return;
-    }
-    if (eventDescription === "") {
-      alert("Descrição é obrigatória");
-      return;
-    }
-    if (eventStart === undefined) {
-      alert("Data de início é obrigatória");
-      return;
-    }
     const data = {
       id: eventID,
       title: eventTitle,
@@ -274,7 +262,6 @@ export default function Planejamento() {
   useEffect(() => {
     applyFilters();
   }, [dataEvents]);
-  // }, [dataEvents, filterTitle, filterStartDate, filterEndDate]);
   return (
     <>
       <NavBar title="Planejamento" />

@@ -1,7 +1,5 @@
 import { axiosInstance } from "@/api/axiosInstance";
 import NavBar from "@/components/NavBar";
-
-import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,16 +12,19 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ChevronDown, MoreHorizontal } from "lucide-react";
-
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  MoreHorizontal,
+  PlusCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -35,8 +36,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import AddEstoque from "./addEstoque";
+import { Badge } from "@/components/ui/badge";
+import { showAlert } from "@/components/ShowAlerts";
+import { Label } from "@/components/ui/label";
+import Cookies from "js-cookie";
 
 export type StorageType = {
   id: number;
@@ -50,158 +67,82 @@ export type StorageType = {
   created_at: string;
   updated_at: string;
 };
+function SortableHeader({ column, title }: { column: any; title: string }) {
+  return (
+    <Button
+      variant="ghost"
+      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    >
+      {title}
+      {column.getIsSorted() === "asc" && <ArrowUp className="ml-2 h-4 w-4" />}
+      {column.getIsSorted() === "desc" && (
+        <ArrowDown className="ml-2 h-4 w-4" />
+      )}
+    </Button>
+  );
+}
 export default function Estoque() {
+  const userJson = JSON.parse(Cookies.get("User") || "{}");
   const columns: ColumnDef<StorageType>[] = [
     {
       accessorKey: "name",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Nome
-            {column.getIsSorted() === "asc" && (
-              <ArrowUp className="ml-2 h-4 w-4" />
-            )}
-            {column.getIsSorted() === "desc" && (
-              <ArrowDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("name")}</div>
-      ),
+      header: ({ column }) => <SortableHeader column={column} title="Nome" />,
+      cell: ({ row }) => <div>{row.getValue("name")}</div>,
     },
     {
       accessorKey: "description",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Descrição
-            {column.getIsSorted() === "asc" && (
-              <ArrowUp className="ml-2 h-4 w-4" />
-            )}
-            {column.getIsSorted() === "desc" && (
-              <ArrowDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
+      header: ({ column }) => (
+        <SortableHeader column={column} title="Descrição" />
+      ),
       cell: ({ row }) => <div>{row.getValue("description")}</div>,
     },
     {
       accessorKey: "quantity",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Quantidade
-            {column.getIsSorted() === "asc" && (
-              <ArrowUp className="ml-2 h-4 w-4" />
-            )}
-            {column.getIsSorted() === "desc" && (
-              <ArrowDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
+      header: ({ column }) => (
+        <SortableHeader column={column} title="Quantidade" />
+      ),
       cell: ({ row }) => <div>{row.getValue("quantity")}</div>,
     },
     {
       accessorKey: "unitary_value",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Preço Unitário
-            {column.getIsSorted() === "asc" && (
-              <ArrowUp className="ml-2 h-4 w-4" />
-            )}
-            {column.getIsSorted() === "desc" && (
-              <ArrowDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
+      header: ({ column }) => (
+        <SortableHeader column={column} title="Preço Unitário" />
+      ),
       cell: ({ row }) => <div>{row.getValue("unitary_value")}</div>,
     },
     {
       accessorKey: "entry_date",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Data de Entrada
-            {column.getIsSorted() === "asc" && (
-              <ArrowUp className="ml-2 h-4 w-4" />
-            )}
-            {column.getIsSorted() === "desc" && (
-              <ArrowDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
+      header: ({ column }) => (
+        <SortableHeader column={column} title="Data de Entrada" />
+      ),
       cell: ({ row }) => <div>{row.getValue("entry_date")}</div>,
     },
     {
       accessorKey: "expiration_date",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Data de Expiração
-            {column.getIsSorted() === "asc" && (
-              <ArrowUp className="ml-2 h-4 w-4" />
-            )}
-            {column.getIsSorted() === "desc" && (
-              <ArrowDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
+      header: ({ column }) => (
+        <SortableHeader column={column} title="Data de Expiração" />
+      ),
       cell: ({ row }) => <div>{row.getValue("expiration_date")}</div>,
     },
     {
       id: "actions",
-      enableHiding: true,
       cell: ({ row }) => {
         const storage = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Abri menu ações</span>
+                <span className="sr-only">Abrir menu ações</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {/* <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(storage.id.toString())
-              }
-            >
-              Copy payment ID
-            </DropdownMenuItem> */}
+              <DropdownMenuItem onClick={() => handleEditClick(storage)}>
+                Editar
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleDeleteClick(storage.id)}>
                 Excluir
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {/* <DropdownMenuItem>Mostrar Movimentações</DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -209,10 +150,17 @@ export default function Estoque() {
     },
   ];
   const fetchStorages = async () => {
-    const response = await axiosInstance.get("storages/company/1");
+    const response = await axiosInstance.get(
+      "storages/company/" + userJson.company_id
+    );
     return response.data;
   };
-
+  const fetchExpireStorages = async () => {
+    const response = await axiosInstance.get(
+      "storages/" + userJson.company_id + "/expiring"
+    );
+    return response.data;
+  };
   const handleDeleteClick = (id: number) => {
     Swal.fire({
       title: "Deseja excluir este registro?",
@@ -221,7 +169,6 @@ export default function Estoque() {
       denyButtonText: `Não`,
     }).then((result) => {
       if (result.isConfirmed) {
-        alert("Excluído com sucesso" + id);
         axiosInstance
           .delete(`storages/${id}`)
           .then(() => {
@@ -234,15 +181,60 @@ export default function Estoque() {
       }
     });
   };
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedStorage, setSelectedStorage] = useState<StorageType | null>(
+    null
+  );
+  // Função para converter de "dd/mm/yyyy" para "yyyy-mm-dd" (formato aceito pelo input de data)
+  const toInputDateFormat = (dateStr: string) => {
+    const [day, month, year] = dateStr.split("/");
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleEditClick = (storage: StorageType) => {
+    setSelectedStorage({
+      ...storage,
+      entry_date: toInputDateFormat(storage.entry_date), // Converte para "yyyy-mm-dd"
+      expiration_date: toInputDateFormat(storage.expiration_date),
+    });
+    setIsEditModalOpen(true);
+  };
+  const handleUpdateStorage = () => {
+    if (!selectedStorage) return;
+    if (selectedStorage.entry_date >= selectedStorage.expiration_date) {
+      showAlert(
+        "error",
+        "Data de expiração inválida",
+        "A data de expiração deve ser maior que a data de entrada"
+      );
+      return;
+    }
+    axiosInstance
+      .put("storages/" + selectedStorage?.id, {
+        name: selectedStorage?.name,
+        description: selectedStorage?.description,
+        unitary_value: parseFloat(selectedStorage?.unitary_value),
+        entry_date: selectedStorage?.entry_date,
+        expiration_date: selectedStorage?.expiration_date,
+        company_id: selectedStorage?.company_id,
+      })
+      .then(() => {
+        showAlert("success", "Atualizado com sucesso", "Estoque atualizado");
+        setIsEditModalOpen(false);
+        fetchStorages().then((data) => setData(data));
+        setGetDataStorage(!getDataStorage);
+      })
+      .catch(() => {
+        showAlert("error", "Erro ao atualizar", "Tente novamente mais tarde");
+      });
+  };
 
   const [data, setData] = useState<StorageType[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+  const [expiringStorages, setExpiringStorages] = useState<StorageType[]>([]);
 
   const table = useReactTable({
     data,
@@ -262,14 +254,146 @@ export default function Estoque() {
       rowSelection,
     },
   });
+  const [getDataStorage, setGetDataStorage] = useState(false);
 
   useEffect(() => {
-    fetchStorages().then((data) => setData(data));
-  }, []);
+    fetchStorages().then(setData);
+    fetchExpireStorages().then(setExpiringStorages);
+  }, [getDataStorage]);
 
   return (
     <div>
       <NavBar title="Estoque" />
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Estoque</DialogTitle>
+            <DialogDescription>Verifique os campos abaixo:</DialogDescription>
+          </DialogHeader>
+          {selectedStorage && (
+            <div className="flex flex-col gap-4">
+              <Label htmlFor="nome">Nome</Label>
+              <Input
+                placeholder="Nome"
+                value={selectedStorage.name}
+                onChange={(e) =>
+                  setSelectedStorage({
+                    ...selectedStorage,
+                    name: e.target.value,
+                  })
+                }
+              />
+              <Label htmlFor="descricao">Descrição</Label>
+              <Input
+                placeholder="Descrição"
+                value={selectedStorage.description}
+                onChange={(e) =>
+                  setSelectedStorage({
+                    ...selectedStorage,
+                    description: e.target.value,
+                  })
+                }
+              />
+              <div className="flex flex-col sm:items-center sm:flex-row gap-2">
+                <Label htmlFor="preco_unitario">Preço Unitário</Label>
+                <Input
+                  placeholder="Valor Unitário"
+                  value={selectedStorage.unitary_value}
+                  onChange={(e) =>
+                    setSelectedStorage({
+                      ...selectedStorage,
+                      unitary_value: e.target.value,
+                    })
+                  }
+                />
+                <Label htmlFor="quantidade">Quantidade</Label>
+                <Input
+                  placeholder="Quantidade"
+                  value={selectedStorage.quantity}
+                  onChange={(e) =>
+                    setSelectedStorage({
+                      ...selectedStorage,
+                      quantity: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="flex flex-col sm:items-center sm:flex-row gap-2">
+                <Label htmlFor="data_entrada">Data Entrada</Label>
+                <Input
+                  name="data_entrada"
+                  placeholder="Entrada"
+                  type="date"
+                  required
+                  value={
+                    selectedStorage?.entry_date
+                      ? new Date(selectedStorage.entry_date)
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setSelectedStorage({
+                      ...selectedStorage,
+                      entry_date: e.target.value,
+                    })
+                  }
+                />
+                <Label htmlFor="data_expiracao">Data Expiração</Label>
+                <Input
+                  type="date"
+                  placeholder="Data de Expiração"
+                  value={selectedStorage.expiration_date}
+                  onChange={(e) =>
+                    setSelectedStorage({
+                      ...selectedStorage,
+                      expiration_date: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <Button onClick={handleUpdateStorage}>Atualizar</Button>
+              <DialogClose asChild>
+                <Button variant="ghost">Cancelar</Button>
+              </DialogClose>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      <div className="w-full flex gap-4 items-center">
+        <p className="text-lg font-semibold">
+          Produto que vai expirar em 7 dias:
+        </p>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="h-8 w-8 p-0">
+              <Badge>{expiringStorages.length}</Badge>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Produtos</DialogTitle>
+              <DialogDescription>
+                Produtos que vão expirar em 7 dias
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-between">
+              <p>Nome</p>
+              <p>Data de Expiração</p>
+            </div>
+            {expiringStorages.map((storage) => (
+              <div key={storage.id} className="flex justify-between">
+                <p>{storage.name}</p>
+                <p>
+                  {new Date(storage.expiration_date).toLocaleDateString(
+                    "pt-BR"
+                  )}
+                </p>
+              </div>
+            ))}
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <div className="w-full">
         <div className="flex items-center py-4">
@@ -279,8 +403,26 @@ export default function Estoque() {
             onChange={(event) =>
               table.getColumn("name")?.setFilterValue(event.target.value)
             }
-            className="max-w-sm"
+            className="max-w-sm mr-4"
           />
+          <Dialog>
+            <DialogTrigger className="flex gap-2">
+              <PlusCircle /> Estoque
+            </DialogTrigger>
+            <DialogContent className="w-1/2 sm:w-full">
+              <DialogHeader>
+                <DialogTitle>Adicione um novo item ao estoque</DialogTitle>
+                <DialogDescription>
+                  Verifique os campos abaixo:
+                </DialogDescription>
+              </DialogHeader>
+              <AddEstoque
+                setGetDataStorage={setGetDataStorage}
+                getDataStorage={getDataStorage}
+              />
+            </DialogContent>
+          </Dialog>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
