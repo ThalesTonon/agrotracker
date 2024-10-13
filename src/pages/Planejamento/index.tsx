@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 import { useCallback, useEffect, useState } from "react";
 import { ptBR } from "date-fns/locale/pt-BR";
-import { endOfDay, format, startOfDay } from "date-fns";
+import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
