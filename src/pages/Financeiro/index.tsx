@@ -197,7 +197,7 @@ export default function Financeiro() {
   return (
     <div>
       <NavBar title="Financeiro" />
-      <div className="w-full">
+      {/* <div className="w-full">
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter emails..."
@@ -308,7 +308,7 @@ export default function Financeiro() {
             </Button>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

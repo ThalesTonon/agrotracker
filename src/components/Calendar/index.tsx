@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -7,9 +6,6 @@ import pt_br from "@fullcalendar/core/locales/pt-br";
 import "./Calendar.css";
 
 const CalendarComponent = (events: any) => {
-  useEffect(() => {
-    console.log(events);
-  }, [events]);
   return (
     <FullCalendar
       locales={[pt_br]}

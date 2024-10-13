@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { endOfDay, format, startOfDay } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -58,7 +58,7 @@ export default function Planejamento() {
   const [dataEvents, setDataEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const formatDateForMySQL = (date: any) => {
+  const formatDateForMySQL = (date: Date | undefined): string => {
     return date ? date.toISOString().slice(0, 19).replace("T", " ") : "";
   };
   const fetchEvents = () => {
@@ -89,7 +89,6 @@ export default function Planejamento() {
       });
   };
   const postEvents = (data: Event) => {
-    console.log(data);
     axiosInstance
       .post("events", data)
       .then(() => {
@@ -135,6 +134,10 @@ export default function Planejamento() {
       user_id: parseInt(userId),
       company_id: parseInt(idCompanyByUser),
     };
+    if (data.start > data.end) {
+      showAlert("error", "Erro", "Data de início maior que data de fim");
+      return;
+    }
     putEvents(data);
   };
 
@@ -169,30 +172,26 @@ export default function Planejamento() {
     setEventStart(undefined);
     setEventEnd(undefined);
   };
+  const handleDateChange = useCallback((dateStr: string): Date => {
+    const selectedDate = new Date(dateStr);
+    return new Date(
+      selectedDate.getTime() + selectedDate.getTimezoneOffset() * 60000
+    ); // Converte para o fuso horário local
+  }, []);
   const handleAddEvent = () => {
-    if (eventTitle === "") {
-      showAlert("error", "Erro", "Título é obrigatório");
-      return;
-    }
-    if (eventDescription === "") {
-      showAlert("error", "Erro", "Descrição é obrigatória");
-      return;
-    }
-    if (eventStart === undefined) {
-      showAlert("error", "Erro", "Data de início é obrigatória");
-      return;
-    }
-    eventStart?.setHours(23, 59, 59);
-    eventEnd?.setHours(23, 59, 59);
-
     const data = {
+      id: eventID || undefined,
       title: eventTitle,
       description: eventDescription,
-      start: eventStart?.toISOString().split("T")[0] ?? "",
-      end: eventEnd?.toISOString().split("T")[0] ?? "",
+      start: formatDateForMySQL(eventStart),
+      end: formatDateForMySQL(eventEnd),
       user_id: parseInt(userId),
       company_id: parseInt(idCompanyByUser),
     };
+
+    if (eventStart && eventEnd && eventStart > eventEnd) {
+      return showAlert("error", "Erro", "Data de início maior que data de fim");
+    }
     postEvents(data as Event);
     clearStateEvent();
   };
@@ -212,56 +211,50 @@ export default function Planejamento() {
     let results = [...dataEvents];
 
     // Verifica se não há filtros aplicados
-    if (!filterTitle && !filterStartDate && !filterEndDate) {
-      const today = startOfDay(new Date());
+    // if (!filterTitle && !filterStartDate && !filterEndDate) {
+    //   const today = startOfDay(new Date());
 
-      // Filtra eventos a partir do dia de hoje para frente
-      results = results.filter(
-        // Use start date if end date is not defined
-        (event) => {
-          const eventStartDate = startOfDay(new Date(event.start));
-          const eventEndDate = endOfDay(new Date(event.end || event.start)); // Use start date if end date is not defined
-          return (
-            (eventStartDate <= today && eventEndDate >= today) ||
-            eventStartDate >= today
-          );
-        }
+    //   results = results.filter((event) => {
+    //     const eventStartDate = startOfDay(new Date(event.start));
+    //     const eventEndDate = endOfDay(new Date(event.end || event.start));
+    //     return (
+    //       (eventStartDate <= today && eventEndDate >= today) ||
+    //       eventStartDate >= today
+    //     );
+    //   });
+    // } else {
+    //   // Aplica filtros existentes
+    //   if (filterTitle) {
+    //     results = results.filter((event) =>
+    //       event.title.toLowerCase().includes(filterTitle.toLowerCase())
+    //     );
+    //   }
+    //   if (filterStartDate || filterEndDate) {
+    //     results = results.filter((event) => {
+    //       const eventStartDate = startOfDay(new Date(event.start));
+    //       const eventEndDate = endOfDay(new Date(event.end || event.start));
 
-        // startOfDay(new Date(event.start)) >= today
-      );
-    } else {
-      // Aplica filtros existentes
-      if (filterTitle) {
-        results = results.filter((event) =>
-          event.title.toLowerCase().includes(filterTitle.toLowerCase())
-        );
-      }
-      if (filterStartDate || filterEndDate) {
-        results = results.filter((event) => {
-          const eventStartDate = startOfDay(new Date(event.start));
-          const eventEndDate = endOfDay(new Date(event.end || event.start));
+    //       const filterStart = filterStartDate
+    //         ? startOfDay(filterStartDate)
+    //         : undefined;
+    //       const filterEnd = filterEndDate ? endOfDay(filterEndDate) : undefined;
 
-          const filterStart = filterStartDate
-            ? startOfDay(filterStartDate)
-            : undefined;
-          const filterEnd = filterEndDate ? endOfDay(filterEndDate) : undefined;
+    //       // Verifica se há sobreposição entre o intervalo do evento e o intervalo do filtro
+    //       const isOverlapping =
+    //         (!filterStart || eventEndDate >= filterStart) &&
+    //         (!filterEnd || eventStartDate <= filterEnd);
 
-          // Verifica se há sobreposição entre o intervalo do evento e o intervalo do filtro
-          const isOverlapping =
-            (!filterStart || eventEndDate >= filterStart) &&
-            (!filterEnd || eventStartDate <= filterEnd);
-
-          return isOverlapping;
-        });
-      }
-    }
+    //       return isOverlapping;
+    //     });
+    //   }
+    // }
 
     setFilteredEvents(results);
   };
 
   useEffect(() => {
     applyFilters();
-  }, [dataEvents]);
+  }, [dataEvents, filterTitle, filterStartDate, filterEndDate]);
   return (
     <>
       <NavBar title="Planejamento" />
@@ -312,55 +305,25 @@ export default function Planejamento() {
                         onChange={(e) => setEventDescription(e.target.value)}
                       />
                       <p className="font-bold">Data Início:</p>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full">
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {eventStart
-                              ? format(eventStart, "dd/MM/yyyy")
-                              : "Início"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-auto p-0"
-                          side="top"
-                          align="center"
-                        >
-                          <Calendar
-                            id="startADD"
-                            locale={ptBR}
-                            mode="single"
-                            selected={eventStart}
-                            onSelect={setEventStart}
-                            defaultMonth={eventStart}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <Input
+                        type="date"
+                        value={
+                          eventStart ? format(eventStart, "yyyy-MM-dd") : ""
+                        }
+                        onChange={(e) =>
+                          setEventStart(handleDateChange(e.target.value))
+                        }
+                      />
+
                       <p className="font-bold">Data Fim:</p>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full">
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {eventEnd ? format(eventEnd, "dd/MM/yyyy") : "Fim"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-auto p-0"
-                          side="top"
-                          align="center"
-                        >
-                          <Calendar
-                            id="endADD"
-                            locale={ptBR}
-                            mode="single"
-                            selected={eventEnd}
-                            onSelect={setEventEnd}
-                            defaultMonth={eventEnd}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+
+                      <Input
+                        type="date"
+                        value={eventEnd ? format(eventEnd, "yyyy-MM-dd") : ""}
+                        onChange={(e) =>
+                          setEventEnd(handleDateChange(e.target.value))
+                        }
+                      />
                     </div>
                     <Button
                       className="w-auto"
@@ -375,7 +338,9 @@ export default function Planejamento() {
                 </Dialog>
                 <Drawer direction="right">
                   <DrawerTrigger asChild>
-                    <Button variant="outline">Filtros</Button>
+                    <Button variant="outline" className="sr-only">
+                      Filtros
+                    </Button>
                   </DrawerTrigger>
                   <DrawerContent className="flex flex-col h-full items-center  w-auto justify-center sm:ml-[50%]">
                     <div className="flex flex-col w-auto m-auto">
@@ -406,7 +371,22 @@ export default function Planejamento() {
                           <label htmlFor="startFILTER" className="font-bold">
                             Data Início:
                           </label>
-                          <Popover>
+                          <Input
+                            className="w-3/4"
+                            id="startFILTER"
+                            type="date"
+                            value={
+                              filterStartDate
+                                ? format(filterStartDate, "yyyy-MM-dd")
+                                : ""
+                            }
+                            onChange={(e) =>
+                              setFilterStartDate(
+                                handleDateChange(e.target.value)
+                              )
+                            }
+                          />
+                          {/* <Popover>
                             <PopoverTrigger asChild>
                               <Button variant="outline" className="w-3/4">
                                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -429,7 +409,7 @@ export default function Planejamento() {
                                 defaultMonth={filterStartDate}
                               />
                             </PopoverContent>
-                          </Popover>
+                          </Popover> */}
                         </div>
                         <div className="flex flex-row justify-between">
                           <label htmlFor="endFILTER" className="font-bold">
@@ -549,57 +529,29 @@ export default function Planejamento() {
                                 }
                               />
                               <p className="font-bold">Início</p>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button variant="outline">
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {eventStart
-                                      ? format(eventStart, "dd/MM/yyyy")
-                                      : "Início"}
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                  className="w-auto p-0"
-                                  side="top"
-                                  align="center"
-                                >
-                                  <Calendar
-                                    id="startEDIT"
-                                    locale={ptBR}
-                                    mode="single"
-                                    selected={eventStart}
-                                    onSelect={setEventStart}
-                                    initialFocus
-                                    defaultMonth={eventStart}
-                                  />
-                                </PopoverContent>
-                              </Popover>
+                              <Input
+                                type="date"
+                                value={
+                                  eventStart
+                                    ? format(eventStart, "yyyy-MM-dd")
+                                    : ""
+                                }
+                                onChange={(e) =>
+                                  setEventStart(
+                                    handleDateChange(e.target.value)
+                                  )
+                                }
+                              />
                               <p className="font-bold">Fim</p>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button variant="outline">
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {eventEnd
-                                      ? format(eventEnd, "dd/MM/yyyy")
-                                      : "Fim"}
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                  className="w-auto p-0"
-                                  side="top"
-                                  align="center"
-                                >
-                                  <Calendar
-                                    id="endEDIT"
-                                    locale={ptBR}
-                                    mode="single"
-                                    selected={eventEnd}
-                                    onSelect={setEventEnd}
-                                    defaultMonth={eventEnd}
-                                    initialFocus
-                                  />
-                                </PopoverContent>
-                              </Popover>
+                              <Input
+                                type="date"
+                                value={
+                                  eventEnd ? format(eventEnd, "yyyy-MM-dd") : ""
+                                }
+                                onChange={(e) =>
+                                  setEventEnd(handleDateChange(e.target.value))
+                                }
+                              />
                             </div>
                           </div>
                           <Button

@@ -9,6 +9,8 @@ import Produtos from "@/pages/Produtos";
 import Estoque from "@/pages/Estoque";
 import Reset from "@/pages/ResetPassword";
 import CheckCode from "@/pages/ResetPassword/send-code";
+import Equipamentos from "@/pages/Equipamentos";
+import Configuracoes from "@/pages/Configuracoes";
 
 const isAuthenticated = Cookies.get("access_token") ? true : false;
 
@@ -59,7 +61,22 @@ export default function RoutesComponent() {
               </PrivateRoute>
             }
           />
-
+          <Route
+            path="/equipamentos"
+            element={
+              <PrivateRoute>
+                <Equipamentos />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/configuracoes"
+            element={
+              <PrivateRoute>
+                <Configuracoes />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/planejamento"
             element={

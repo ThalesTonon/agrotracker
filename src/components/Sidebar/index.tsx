@@ -66,7 +66,7 @@ export function Sidebar() {
         <nav className="flex flex-col items-center gap-4 px-2 py-5">
           <TooltipProvider>
             <Link
-              to="/"
+              to="/home"
               className="flex h-9 w-9 shrink-0 items-center justify-center text-primary-foreground rounded-full bg-primary/20 transition-colors hover:bg-primary/10"
             >
               <img src={logo} alt="Logo do projeto" />
@@ -110,7 +110,7 @@ export function Sidebar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  to="#"
+                  to="equipamentos"
                   className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Tractor className="h-5 w-5" />
@@ -146,7 +146,7 @@ export function Sidebar() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Link
-                      to="#"
+                      to="configuracoes"
                       className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
                     >
                       <Settings className="h-5 w-5" />
@@ -193,7 +193,7 @@ export function Sidebar() {
                 </SheetDescription>
                 <nav className="grid gap-6 text-lg font-medium">
                   <Link
-                    to="#"
+                    to="/home"
                     className="flex h-10 w-10 bg-primary/20 rounded-full items-center justify-center text-primary-foreground md:text-base"
                   >
                     <img src={logo} alt="Logo do projeto" />
@@ -228,7 +228,7 @@ export function Sidebar() {
                     Estoque
                   </Link>
                   <Link
-                    to="#"
+                    to="equipamentos"
                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
                   >
                     <Tractor className="h-5 w-5 transition-all" />
@@ -258,7 +258,7 @@ export function Sidebar() {
                         Produtos
                       </Link>
                       <Link
-                        to="#"
+                        to="configuracoes"
                         className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-primary-foreground"
                       >
                         <Settings className="h-5 w-5 transition-all" />
